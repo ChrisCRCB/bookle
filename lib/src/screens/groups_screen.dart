@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:recase/recase.dart';
 
 import '../../bookle.dart';
-import '../providers.dart';
 
 /// A screen that shows the groups calendar.
 class GroupsScreen extends ConsumerStatefulWidget {
@@ -41,57 +40,74 @@ class GroupsScreenState extends ConsumerState<GroupsScreen> {
       body: value.simpleWhen(
         data: (final groups) {
           final timeSlots = _generateTimeSlots();
-          return SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Column(
-              children: [
-                // Header Row with empty top-left and day headings
-                Row(
+          return Column(
+            children: [
+              // Header Row with empty top-left and day headings
+              Expanded(
+                flex: 2,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     const SizedBox(width: 60), // Empty space for time column
                     ...DayOfWeek.values.map(
-                      (final day) => Expanded(
+                      (final day) => Flexible(
                         child: Center(
                           child: Text(
                             day.name.sentenceCase,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ],
                 ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: timeSlots.length,
-                    itemBuilder: (final context, final index) {
-                      final time = timeSlots[index];
-                      return Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            width: 60,
-                            height: 50,
-                            child: Center(child: Text(time.fo)),
-                          ),
-                          ..._daysOfWeek.map(
-                            (final day) => Expanded(
-                              child: Container(
-                                height: 50,
-                                margin: const EdgeInsets.all(1),
-                                color: Colors.grey[200],
-                                alignment: Alignment.center,
-                                child: Text('$day $time'),
-                              ),
+              ),
+              Expanded(
+                flex: 8,
+                child: ListView.builder(
+                  itemCount: timeSlots.length,
+                  itemBuilder: (final context, final index) {
+                    final time = timeSlots[index];
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 60,
+                          height: 50,
+                          child: Center(child: Text(time.format(context))),
+                        ),
+                        ...DayOfWeek.values.map((final day) {
+                          final current = groups.where(
+                            (final group) =>
+                                group.dayOfWeek == day &&
+                                group.startHour == time.hour &&
+                                group.startMinute >= time.minute &&
+                                group.startMinute <= (time.minute + 30),
+                          );
+                          if (current.isEmpty) {
+                            return const EmptyGridTile();
+                          }
+                          return Flexible(
+                            child: Column(
+                              children: [
+                                ...current.map(
+                                  (final group) => GroupTile(group: group),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
+                          );
+                        }),
+                      ],
+                    );
+                  },
+                  shrinkWrap: true,
                 ),
-              ],
-            ),
+              ),
+            ],
           );
         },
       ),

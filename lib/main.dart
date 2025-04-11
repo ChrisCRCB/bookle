@@ -1,5 +1,3 @@
-import 'package:backstreets_widgets/screens.dart';
-import 'package:backstreets_widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -23,14 +21,6 @@ class MyApp extends StatelessWidget {
       colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       useMaterial3: true,
     ),
-    home: ManageDatabase(
-      child: UsersScreen(
-        builder:
-            (final userId) => SimpleScaffold(
-              title: 'Works',
-              body: CenterText(text: 'User ID: $userId', autofocus: true),
-            ),
-      ),
-    ),
+    home: const ManageDatabase(child: UsersScreen()),
   );
 }

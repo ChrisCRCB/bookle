@@ -6,4 +6,6 @@ export 'src/database/tables/users.dart';
 export 'src/day_of_week.dart';
 export 'src/extensions/async_value_x.dart';
 export 'src/providers.dart';
+export 'src/widgets/empty_grid_tile.dart';
+export 'src/widgets/group_tile.dart';
 export 'src/widgets/manage_database.dart';
